@@ -4,12 +4,12 @@ from pathlib import Path
 import torch
 
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 
 # Paths
 ROOT_PATH = Path(__file__).resolve().parent
-PROTTRANS_PATH = "/scratch/users/ntu/santhise/models/prot_t5_xl_uniref50"
+PROTTRANS_PATH = "/scratch/users/ntu/santhise/models/prottrans"
 MAX_REPR_PATH = ROOT_PATH / "script/ProtTrans_repr_max.npy"
 MIN_REPR_PATH = ROOT_PATH / "script/ProtTrans_repr_min.npy"
 OUTPUT_PATH = ROOT_PATH / "script"

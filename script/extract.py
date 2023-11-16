@@ -78,7 +78,7 @@ def feature_extraction(ID_list, seq_list, outpath, feat_bs, save_feat, device):
             seq_len = (attention_mask[seq_num] == 1).sum()
             seq_emd = embedding[seq_num][: seq_len - 1]
             if save_feat:
-                np.save(feat_path + "/" + batch_ID_list[seq_num], seq_emd)
+                np.save(feat_path / batch_ID_list[seq_num], seq_emd)
             # Normalization
             seq_emd = (seq_emd - Min_repr) / (Max_repr - Min_repr)
             protein_features[batch_ID_list[seq_num]] = seq_emd
