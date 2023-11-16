@@ -4,7 +4,7 @@
 #PBS -q normal
 #PBS -j oe
 #PBS -l select=1:ncpus=24:mem=32G
-#PBS -l walltime=168:00:00
+#PBS -l walltime=48:00:00
 #PBS -P personal-santhise
 #PBS -N lmetalsite
 
