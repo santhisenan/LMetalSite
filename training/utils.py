@@ -110,6 +110,8 @@ def NN_train_and_predict(
     args=None,
 ):
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"Using device {device}")
+
     if not run_id:
         run_id = "run_nn_" + datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         while os.path.exists(output_root + run_id + "/"):
