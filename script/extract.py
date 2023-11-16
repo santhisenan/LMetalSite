@@ -13,7 +13,7 @@ import pandas as pd
 import re
 import string
 
-from ..config import (
+from config import (
     PROTTRANS_PATH,
     MODELS_PATH,
     MAX_REPR_PATH,
@@ -25,6 +25,8 @@ from ..config import (
     EPOCHS,
 )
 
+print(f"Device: {DEVICE}")
+
 Max_repr = np.load(MAX_REPR_PATH)
 Min_repr = np.load(MIN_REPR_PATH)
 
@@ -32,7 +34,7 @@ Min_repr = np.load(MIN_REPR_PATH)
 def feature_extraction(ID_list, seq_list, outpath, feat_bs, save_feat, device):
     protein_features = {}
     if save_feat:
-        feat_path = outpath + "ProtTrans_repr"
+        feat_path = outpath / "ProtTrans_repr"
         os.makedirs(feat_path, exist_ok=True)
 
     # Load the vocabulary and ProtT5-XL-UniRef50 Model
