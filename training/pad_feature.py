@@ -4,52 +4,57 @@ import pandas as pd
 import torch
 from tqdm import tqdm
 
-Dataset_Path = './Dataset/'
-Feature_Path = './Feature/'
+Dataset_Path = "./Dataset/"
+Feature_Path = "./Feature/"
 
 NODE_DIM = 1024
-max_len = 1000 # within train & tests
+max_len = 1000  # within train & tests
 metal_list = ["ZN", "CA", "MG", "MN"]
 
 
-
 def prepare_features(pdb_id, dataset):
-    node_features = np.load(Feature_Path + f'ProtTrans/emb/{pdb_id}.npy')
+    node_features = np.load(Feature_Path + f"ProtTrans/emb/{pdb_id}.npy")
 
     # Padding
     padded_node_features = np.zeros((max_len, NODE_DIM))
-    padded_node_features[:node_features.shape[0]] = node_features
-    padded_node_features = torch.tensor(padded_node_features, dtype = torch.float)
+    padded_node_features[: node_features.shape[0]] = node_features
+    padded_node_features = torch.tensor(padded_node_features, dtype=torch.float)
 
     masks = np.zeros(max_len)
-    masks[:node_features.shape[0]] = 1
-    masks = torch.tensor(masks, dtype = torch.long)
-
+    masks[: node_features.shape[0]] = 1
+    masks = torch.tensor(masks, dtype=torch.long)
 
     labels = dataset[pdb_id][1]
-    padded_labels = [] # labels for multi-task learning
-    label_masks = []   # masks for multi-task learning
+    padded_labels = []  # labels for multi-task learning
+    label_masks = []  # masks for multi-task learning
     for i in range(len(metal_list)):
         padded_y = np.zeros(max_len)
         label_mask = np.zeros(max_len)
         y = labels[i]
         if y:
-            padded_y[:node_features.shape[0]] = y
+            padded_y[: node_features.shape[0]] = y
             # labels for single-task learning
-            torch.save(torch.tensor(padded_y, dtype = torch.float), Feature_Path + f'input_protrans/{metal_list[i]}_label/{pdb_id}_label.tensor')
+            torch.save(
+                torch.tensor(padded_y, dtype=torch.float),
+                Feature_Path
+                + f"input_protrans/{metal_list[i]}_label/{pdb_id}_label.tensor",
+            )
 
-            label_mask[:node_features.shape[0]] = 1
+            label_mask[: node_features.shape[0]] = 1
 
         padded_labels += list(padded_y)
         label_masks += list(label_mask)
-    padded_labels = torch.tensor(padded_labels, dtype = torch.float)
-    label_masks = torch.tensor(label_masks, dtype = torch.float)
+    padded_labels = torch.tensor(padded_labels, dtype=torch.float)
+    label_masks = torch.tensor(label_masks, dtype=torch.float)
 
     # Save
-    torch.save(padded_node_features, Feature_Path + f'input_protrans/{pdb_id}_node_feature.tensor')
-    torch.save(padded_labels, Feature_Path + f'input_protrans/{pdb_id}_label.tensor')
-    torch.save(masks, Feature_Path + f'input_protrans/{pdb_id}_mask.tensor')
-    torch.save(label_masks, Feature_Path + f'input_protrans/{pdb_id}_label_mask.tensor')
+    torch.save(
+        padded_node_features,
+        Feature_Path + f"input_protrans/{pdb_id}_node_feature.tensor",
+    )
+    torch.save(padded_labels, Feature_Path + f"input_protrans/{pdb_id}_label.tensor")
+    torch.save(masks, Feature_Path + f"input_protrans/{pdb_id}_mask.tensor")
+    torch.save(label_masks, Feature_Path + f"input_protrans/{pdb_id}_label_mask.tensor")
 
 
 def pickle2csv(metal_name):
@@ -65,7 +70,7 @@ def pickle2csv(metal_name):
 
     train_dic = {"ID": train_IDs, "sequence": train_sequences, "label": train_labels}
     train_dataframe = pd.DataFrame(train_dic)
-    train_dataframe.to_csv(Dataset_Path + metal_name + '_train.csv', index=False)
+    train_dataframe.to_csv(Dataset_Path + metal_name + "_train.csv", index=False)
 
     with open(Dataset_Path + metal_name + "_test.pkl", "rb") as f:
         test = pickle.load(f)
@@ -79,11 +84,10 @@ def pickle2csv(metal_name):
 
     test_dic = {"ID": test_IDs, "sequence": test_sequences, "label": test_labels}
     test_dataframe = pd.DataFrame(test_dic)
-    test_dataframe.to_csv(Dataset_Path + metal_name + '_test.csv', index=False)
+    test_dataframe.to_csv(Dataset_Path + metal_name + "_test.csv", index=False)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     for metal_name in metal_list:
         pickle2csv(metal_name)
     pickle2csv("Metal")

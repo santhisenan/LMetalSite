@@ -16,7 +16,7 @@ class Self_Attention(nn.Module):
         return x.permute(0, 2, 1, 3)
 
     def forward(self, q, k, v, mask=None):
-        q = self.transpose_for_scores(q) # [bsz, heads, protein_len, hid]
+        q = self.transpose_for_scores(q)  # [bsz, heads, protein_len, hid]
         k = self.transpose_for_scores(k)
         v = self.transpose_for_scores(v)
 
@@ -24,7 +24,9 @@ class Self_Attention(nn.Module):
 
         if mask is not None:
             attention_mask = (1.0 - mask) * -10000
-            attention_scores = attention_scores + attention_mask.unsqueeze(1).unsqueeze(1) # [bsz, heads, protein_len, protein_len] + [bsz, 1, 1, protein_len]
+            attention_scores = attention_scores + attention_mask.unsqueeze(1).unsqueeze(
+                1
+            )  # [bsz, heads, protein_len, protein_len] + [bsz, 1, 1, protein_len]
 
         attention_scores = nn.Softmax(dim=-1)(attention_scores)
 
@@ -49,10 +51,12 @@ class PositionWiseFeedForward(nn.Module):
 
 
 class TransformerLayer(nn.Module):
-    def __init__(self, num_hidden = 64, num_heads = 4, dropout = 0.2):
+    def __init__(self, num_hidden=64, num_heads=4, dropout=0.2):
         super(TransformerLayer, self).__init__()
         self.dropout = nn.Dropout(dropout)
-        self.norm = nn.ModuleList([nn.LayerNorm(num_hidden, eps=1e-6) for _ in range(2)])
+        self.norm = nn.ModuleList(
+            [nn.LayerNorm(num_hidden, eps=1e-6) for _ in range(2)]
+        )
 
         self.attention = Self_Attention(num_hidden, num_heads)
         self.dense = PositionWiseFeedForward(num_hidden, num_hidden * 4)
@@ -66,7 +70,7 @@ class TransformerLayer(nn.Module):
         dh = self.dense(h_V)
         h_V = self.norm[1](h_V + self.dropout(dh))
 
-        if mask is not None: # mask掉padding的节点
+        if mask is not None:  # mask掉padding的节点
             mask = mask.unsqueeze(-1)
             h_V = mask * h_V
         return h_V

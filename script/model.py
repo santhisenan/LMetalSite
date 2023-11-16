@@ -16,7 +16,7 @@ class Self_Attention(nn.Module):
         return x.permute(0, 2, 1, 3)
 
     def forward(self, q, k, v, mask=None):
-        q = self.transpose_for_scores(q) # [bsz, heads, protein_len, hid]
+        q = self.transpose_for_scores(q)  # [bsz, heads, protein_len, hid]
         k = self.transpose_for_scores(k)
         v = self.transpose_for_scores(v)
 
@@ -24,7 +24,9 @@ class Self_Attention(nn.Module):
 
         if mask is not None:
             attention_mask = (1.0 - mask) * -10000
-            attention_scores = attention_scores + attention_mask.unsqueeze(1).unsqueeze(1)
+            attention_scores = attention_scores + attention_mask.unsqueeze(1).unsqueeze(
+                1
+            )
 
         attention_scores = nn.Softmax(dim=-1)(attention_scores)
 
@@ -49,10 +51,12 @@ class PositionWiseFeedForward(nn.Module):
 
 
 class TransformerLayer(nn.Module):
-    def __init__(self, num_hidden = 64, num_heads = 4, dropout = 0.2):
+    def __init__(self, num_hidden=64, num_heads=4, dropout=0.2):
         super(TransformerLayer, self).__init__()
         self.dropout = nn.Dropout(dropout)
-        self.norm = nn.ModuleList([nn.LayerNorm(num_hidden, eps=1e-6) for _ in range(2)])
+        self.norm = nn.ModuleList(
+            [nn.LayerNorm(num_hidden, eps=1e-6) for _ in range(2)]
+        )
 
         self.attention = Self_Attention(num_hidden, num_heads)
         self.dense = PositionWiseFeedForward(num_hidden, num_hidden * 4)
@@ -73,7 +77,15 @@ class TransformerLayer(nn.Module):
 
 
 class LMetalSite(nn.Module):
-    def __init__(self, feature_dim, hidden_dim=64, num_encoder_layers=2, num_heads=4, augment_eps=0.05, dropout=0.2):
+    def __init__(
+        self,
+        feature_dim,
+        hidden_dim=64,
+        num_encoder_layers=2,
+        num_heads=4,
+        augment_eps=0.05,
+        dropout=0.2,
+    ):
         super(LMetalSite, self).__init__()
 
         # Hyperparameters
@@ -81,24 +93,26 @@ class LMetalSite(nn.Module):
 
         # Embedding layers
         self.input_block = nn.Sequential(
-                                         nn.LayerNorm(feature_dim, eps=1e-6)
-                                        ,nn.Linear(feature_dim, hidden_dim)
-                                        ,nn.LeakyReLU()
-                                        )
+            nn.LayerNorm(feature_dim, eps=1e-6),
+            nn.Linear(feature_dim, hidden_dim),
+            nn.LeakyReLU(),
+        )
 
         self.hidden_block = nn.Sequential(
-                                          nn.LayerNorm(hidden_dim, eps=1e-6)
-                                         ,nn.Dropout(dropout)
-                                         ,nn.Linear(hidden_dim, hidden_dim)
-                                         ,nn.LeakyReLU()
-                                         ,nn.LayerNorm(hidden_dim, eps=1e-6)
-                                         )
+            nn.LayerNorm(hidden_dim, eps=1e-6),
+            nn.Dropout(dropout),
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.LeakyReLU(),
+            nn.LayerNorm(hidden_dim, eps=1e-6),
+        )
 
         # Encoder layers
-        self.encoder_layers = nn.ModuleList([
-            TransformerLayer(hidden_dim, num_heads, dropout)
-            for _ in range(num_encoder_layers)
-        ])
+        self.encoder_layers = nn.ModuleList(
+            [
+                TransformerLayer(hidden_dim, num_heads, dropout)
+                for _ in range(num_encoder_layers)
+            ]
+        )
 
         # ion-specific layers
         self.FC_ZN1 = nn.Linear(hidden_dim, hidden_dim, bias=True)
@@ -115,11 +129,12 @@ class LMetalSite(nn.Module):
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)
 
-
     def forward(self, protein_feat, mask):
         # Data augmentation
         if self.training and self.augment_eps > 0:
-            protein_feat = protein_feat + self.augment_eps * torch.randn_like(protein_feat)
+            protein_feat = protein_feat + self.augment_eps * torch.randn_like(
+                protein_feat
+            )
 
         h_V = self.input_block(protein_feat)
         h_V = self.hidden_block(h_V)
@@ -127,7 +142,9 @@ class LMetalSite(nn.Module):
         for layer in self.encoder_layers:
             h_V = layer(h_V, mask)
 
-        logits_ZN = self.FC_ZN2(F.leaky_relu(self.FC_ZN1(h_V))).squeeze(-1) # [batch_size, maxlen]
+        logits_ZN = self.FC_ZN2(F.leaky_relu(self.FC_ZN1(h_V))).squeeze(
+            -1
+        )  # [batch_size, maxlen]
         logits_CA = self.FC_CA2(F.leaky_relu(self.FC_CA1(h_V))).squeeze(-1)
         logits_MG = self.FC_MG2(F.leaky_relu(self.FC_MG1(h_V))).squeeze(-1)
         logits_MN = self.FC_MN2(F.leaky_relu(self.FC_MN1(h_V))).squeeze(-1)

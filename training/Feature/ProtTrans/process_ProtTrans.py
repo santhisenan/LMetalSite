@@ -18,8 +18,8 @@ with open("../../Dataset/Metal_train.pkl", "rb") as f:
 
 for ID in metal_train:
     raw_protrans = np.load(raw_protrans_path + ID + ".npy")
-    Max_protrans.append(np.max(raw_protrans, axis = 0))
-    Min_protrans.append(np.min(raw_protrans, axis = 0))
+    Max_protrans.append(np.max(raw_protrans, axis=0))
+    Min_protrans.append(np.min(raw_protrans, axis=0))
     all_protrans[ID] = raw_protrans
 
 
@@ -34,8 +34,8 @@ for ID in metal_test:
 
 
 ########## Normalize feature ##########
-Max_protrans = np.max(np.array(Max_protrans), axis = 0)
-Min_protrans = np.min(np.array(Min_protrans), axis = 0)
+Max_protrans = np.max(np.array(Max_protrans), axis=0)
+Min_protrans = np.min(np.array(Min_protrans), axis=0)
 
 np.save("Max_ProtTrans_repr", Max_protrans)
 np.save("Min_ProtTrans_repr", Min_protrans)
