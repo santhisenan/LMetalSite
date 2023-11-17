@@ -88,16 +88,18 @@ def pickle2csv(metal_name):
 
 
 if __name__ == "__main__":
-    for metal_name in metal_list:
-        pickle2csv(metal_name)
+    # for metal_name in metal_list:
+    #     pickle2csv(metal_name)
     pickle2csv("Metal")
 
     with open(Dataset_Path + "Metal_train.pkl", "rb") as f:
         metal_train = pickle.load(f)
     for ID in tqdm(metal_train):
+        print(f"Processing for training {ID=}")
         prepare_features(ID, metal_train)
 
     with open(Dataset_Path + "Metal_test.pkl", "rb") as f:
         metal_test = pickle.load(f)
     for ID in tqdm(metal_test):
+        print(f"Processing for testing {ID=}")
         prepare_features(ID, metal_test)
