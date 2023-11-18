@@ -105,7 +105,7 @@ def NN_train_and_predict(
     model_class,
     config,
     logit=False,
-    output_root="./output/",
+    output_root="./outputs/",
     run_id=None,
     args=None,
 ):
@@ -292,6 +292,7 @@ def NN_train_and_predict(
                         train_loss += len(train_seq_y) * loss.item()
 
                         bar.set_description("loss: %.4f" % (loss.item()))
+                        break
 
                     train_loss /= train_num
                     train_preds = np.concatenate(train_preds)
@@ -561,6 +562,15 @@ def NN_train_and_predict(
             )  # shape = (num_samples, max_len) or (num_samples,  4 * max_len)
             if task == "Metal":
                 for i in range(4):
+                    # print(oof)
+                    # print(metal_list)
+                    # print(val_index)
+                    # print([
+                    #     valid_outputs[:, i * maxlen : (i + 1) * maxlen][
+                    #         j, : len(oof.loc[val_idx, sequence_name])
+                    #     ].tolist()
+                    #     for j, val_idx in enumerate(val_index)
+                    # ])
                     oof.loc[val_index, metal_list[i]] = [
                         valid_outputs[:, i * maxlen : (i + 1) * maxlen][
                             j, : len(oof.loc[val_idx, sequence_name])
