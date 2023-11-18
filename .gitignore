@@ -3,6 +3,8 @@ lmetalsite.o*
 *.npy
 submit*.sh
 *.tensor
+log.txt
+training/outputs/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
