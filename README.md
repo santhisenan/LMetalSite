@@ -9,7 +9,7 @@
 
 This will produce a folder called scriptProtTrans_repr. This folder contains all the features per protein in .npy format.
 
-2. Move the contents of the scriptProtTrans_repr folder (just the contents, dont move the whole folder) to Feature/ProtTrans/raw_emb (from here onwards will just be using the codes author gave to Shen Cheng)
+2. Move the contents of the script/ProtTrans_repr folder (just the contents, dont move the whole folder) to Feature/ProtTrans/raw_emb (from here onwards will just be using the codes author gave to Shen Cheng)
 
 3. Create a folder named emb in Feature/ProtTrans/
 
